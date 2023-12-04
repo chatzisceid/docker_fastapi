@@ -13,8 +13,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Install python-multipart
 RUN pip install python-multipart
 
+# Install COLMAP
+RUN apt-get update && apt-get install -y colmap
+
 # Copy the FastAPI application into the container
-COPY app/main.py .
+COPY app/ .
+
+# Copy the image directory from the local machine to the container
+COPY brandenburg_gate/ /app/brandenburg_gate/
 
 # Expose the port that FastAPI will run on
 EXPOSE 8000
