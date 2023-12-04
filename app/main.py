@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import base64
+import subprocess
 import json
 import os
 import aiofiles
@@ -56,6 +57,29 @@ async def upload_files(data: MultiImageData):
         # Run COLMAP sparse reconstruction on the specified folder
         colmap_sparse_reconstruction(image_folder_path, output_sparse_path)
         print("Sparse reconstruction completed successfully!")
+
+        #execute train.py using subprocess
+        train_script_path = '/app/nerfw/train.py'
+        train_args = [
+            "--img_downscale", "8",
+            "--root_dir", "brandenburg_gate/",
+            "--exp_name", "custom",
+            "--dataset_name", "brandenburg_gate",
+            "--num_epochs", "20",
+            "--batch_size", "2048",
+            "--lr", "5e-4",
+            "--encode_a", "--encode_t",
+            "--N_importance", "128",
+            "--N_vocab", "1500"
+        ]
+        command = ['python', train_script_path] + train_args
+
+        try:
+            subprocess.run(command, check=True, shell=False)
+            print("train.py execution completed successfully!")
+        except subprocess.CalledProcessError as e:
+            print("train.py execution failed:", e)
+
 
         # Write the received data to a JSON file
         json_data = data.json()
