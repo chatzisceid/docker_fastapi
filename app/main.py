@@ -96,9 +96,11 @@ async def upload_images(data: MultiImageData,background_tasks: BackgroundTasks):
         # return {"message": "Training started"}
         try:
             subprocess.run(command, check=True, shell=False)
-            print("train.py execution completed successfully!")
+            subprocess.run(["rm", "-rf", "dataset"], check=True)
         except subprocess.CalledProcessError as e:
             print("train.py execution failed:", e)
+        print("train.py execution completed successfully!")
+        return {"message": "Training finished successfully!"}
 
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="JSON file not found")
