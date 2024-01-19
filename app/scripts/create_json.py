@@ -3,28 +3,34 @@ import base64
 import time
 import os
 
-# Open the image file in binary mode, read it, and encode it to Base64
-with open('test.jpg', 'rb') as file:
-    image_data = file.read()
-    base64_image = base64.b64encode(image_data).decode('utf-8')
+def create_image_json(folder_path):
+    images_list = []
+    id = 1
 
-# Get the current timestamp
-timestamp = time.time()
+    for filename in os.listdir(folder_path):
+        if filename.endswith(('.jpg', '.png', '.jpeg')):  # Filter only image files
+            image_path = os.path.join(folder_path, filename)
 
-# Get the root directory
-root_dir = os.path.dirname(os.path.abspath('image.jpg'))
-id = 1
+            with open(image_path, 'rb') as file:
+                image_data = file.read()
+                base64_image = base64.b64encode(image_data).decode('utf-8')
 
-# Create a dictionary and include the Base64 image data, timestamp, and root directory
-data = {
-    'id': id,
-    'timestamp': timestamp,
-    'image': base64_image
-}
+                timestamp = time.time()
 
-# Convert the dictionary to a JSON string
-json_data = json.dumps(data)
+                image_dict = {
+                    'id': id,
+                    'timestamp': timestamp,
+                    'image_base64': base64_image
+                }
 
-# Write the JSON data to a file
-with open('output.json', 'w') as file:
-    file.write(json_data)
+                images_list.append(image_dict)
+                id += 1
+
+    json_data = {'images': images_list}
+
+    with open('output.json', 'w') as file:
+        json.dump(json_data, file, indent=2)
+
+# Provide the path to the folder containing images
+folder_path = '/media/chatzise/E0E43345E4331CEA/dataset_test/'
+create_image_json(folder_path)

@@ -1,0 +1,6 @@
+# ninja log v5
+0	19134	1702474919863633306	/home/chatzise/docker_fastapi/models/csrc/build/temp.linux-x86_64-3.10/binding.o	3790f6c2c9a12e8f
+1	44590	1702474945336311682	/home/chatzise/docker_fastapi/models/csrc/build/temp.linux-x86_64-3.10/raymarching.o	fcea6e8fae924fa
+0	44656	1702474945404313494	/home/chatzise/docker_fastapi/models/csrc/build/temp.linux-x86_64-3.10/intersection.o	83eab075c10b1bb6
+1	48565	1702474949308417534	/home/chatzise/docker_fastapi/models/csrc/build/temp.linux-x86_64-3.10/volumerendering.o	ba89ff71c8311c4d
+1	50927	1702474951668480437	/home/chatzise/docker_fastapi/models/csrc/build/temp.linux-x86_64-3.10/losses.o	e37f914a999ff4a4

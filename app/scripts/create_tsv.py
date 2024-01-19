@@ -22,3 +22,6 @@ def create_image_data_tsv(folder_path, tsv_file_path):
 
                 # Writing in the specified format
                 tsvfile.write(f"{filename}\t{image_id}\t{split}\t{dataset}\n")
+
+# Create TSV file
+# create_image_data_tsv('/media/chatzise/E0E43345E4331CEA/dataset_fastapi/','dataset/image_data.tsv')
