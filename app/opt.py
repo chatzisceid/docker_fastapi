@@ -38,6 +38,7 @@ def get_args():
       parser.add_argument('--decay_gamma', type=float, default=0.1, help='learning rate decay amount')
       parser.add_argument('--scene_name', type=str, default='test', help='scene name, used as output folder name')
       parser.add_argument('--split', type=str, default='val', choices=['val', 'test', 'test_train'])
+      parser.add_argument('--id', type=str, default='xxxx', help='id')
 
       args = parser.parse_args()
       return args

@@ -5,22 +5,36 @@
 # FROM nvidia/cuda:12.0.0-base-ubuntu20.04
 FROM ubuntu:22.04
 
+# Set environment variables for CUDA compatibility
 ENV DEBIAN_FRONTEND=noninteractive
+ENV NV_ARCH=x86_64
+ENV NVIDIA_REQUIRE_CUDA="cuda>=11.7 brand=tesla,driver>=470,driver<471"
 
 # Update package lists and install necessary packages
 # RUN apt-get update && \
 #     apt-get install -y \
 #     cuda \
 #     && rm -rf /var/lib/apt/lists/*
-RUN apt-get update
-RUN apt-get install -y wget
-RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
-RUN mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
-RUN wget https://developer.download.nvidia.com/compute/cuda/11.7.0/local_installers/cuda-repo-ubuntu2204-11-7-local_11.7.0-515.43.04-1_amd64.deb
-RUN dpkg -i cuda-repo-ubuntu2204-11-7-local_11.7.0-515.43.04-1_amd64.deb
-RUN cp /var/cuda-repo-ubuntu2204-11-7-local/cuda-*-keyring.gpg /usr/share/keyrings/
-RUN apt-get update
-RUN apt-get -y install cuda
+# RUN apt-get update
+# RUN apt-get install -y wget
+# RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
+# RUN mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
+# RUN wget https://developer.download.nvidia.com/compute/cuda/11.7.0/local_installers/cuda-repo-ubuntu2204-11-7-local_11.7.0-515.43.04-1_amd64.deb
+# RUN dpkg -i cuda-repo-ubuntu2204-11-7-local_11.7.0-515.43.04-1_amd64.deb
+# RUN cp /var/cuda-repo-ubuntu2204-11-7-local/cuda-*-keyring.gpg /usr/share/keyrings/
+# RUN apt-get update
+# RUN apt-get -y install cuda
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gnupg2 curl ca-certificates && \
+    curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/${NV_ARCH}/3bf863cc.pub | apt-key add - && \
+    echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/${NV_ARCH} /" > /etc/apt/sources.list.d/cuda.list && \
+    apt-get purge --autoremove -y curl \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cuda-toolkit-11-7 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables (optional but recommended)
 ENV CUDA_HOME=/usr/local/cuda

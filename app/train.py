@@ -222,14 +222,32 @@ async def main(args):
 	for epoch in range(args.num_epochs):
 		print(f"Epoch {epoch + 1} start @ {datetime.datetime.now().strftime('%H%M')}")
 
-#################for fastapi to send progress bar#################
-		await manager.broadcast(f"Epoch {epoch+1} / {args.num_epochs} ")
-#################for fastapi to send progress bar
-#################
+	#########write JSON file##########
+		if epoch == args.num_epochs - 1:
+			status = {"id": args.id, "progress %": 100, "status": "finished"}
+		else:
+			status = {"id": args.id, "progress %": ((epoch+1)/args.num_epochs)*100, "status": "training"}
+
+		# Load the current status from the JSON file
+		try:
+			with open(f"{args.id}.json", "r") as fp:
+				current_status = json.load(fp)
+		except FileNotFoundError:
+			current_status = {}
+
+		# Update the current status with the new status
+		current_status.update(status)
+
+		# Save the updated status to the JSON file
+		with open(f"{args.id}.json", "w") as fp:
+			json.dump(current_status, fp)
+		##################################
+			
 		val_loss = validate_one_epoch(epoch,nerf, val_loader, device)
 		train_loss = train_one_epoch(epoch, nerf, optimizer, train_loader, device)
 		print(f"Epoch {epoch + 1} end, Loss/train: {train_loss}, Loss/validation{val_loss}")
 		scheduler.step()
+
 	saved_model = f"trained_model/{args.exp_name}/{datetime.datetime.now().strftime('%m%d%M')}"
 	if not os.path.exists(saved_model):
 		os.makedirs(saved_model)
