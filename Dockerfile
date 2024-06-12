@@ -110,9 +110,6 @@ RUN git clone https://github.com/colmap/colmap.git
 #Install vren
 # RUN pip install /app/models/csrc
 
-# Copy the FastAPI application into the container
-COPY app/ .
-
 # Copy the image directory from the local machine to the container
 # COPY brandenburg_gate/ /app/brandenburg_gate/
 
@@ -123,6 +120,9 @@ ENV QT_QPA_PLATFORM=minimal
 ENV XDG_RUNTIME_DIR=/tmp/runtime-root
 
 RUN rm -rf /var/lib/apt/lists/*
+
+# Copy the FastAPI application into the container
+COPY app/ .
 
 # Expose the port that FastAPI will run on
 EXPOSE 8000
