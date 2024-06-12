@@ -48,67 +48,21 @@ async def upload_images(data: MultiImageData,background_tasks: BackgroundTasks):
         os.makedirs(f'dataset/{data.id}/dense/images', exist_ok=True)
         os.makedirs(f'dataset/{data.id}/dense/0', exist_ok=True)
 
-        for image_data in data.images:
-            # Generate a filename based on the ID and timestamp
-            ts = time.time()
-            #filename = f'image_{int(ts)}.jpg'
-            filename = f'image_{image_data.url.split("/")[-1]}_{int(ts)}.jpg'
-            file_path = os.path.join(f'dataset/{data.id}/dense/images', filename)
-            # Convert base64 string to bytes
-            #urllib.request.urlretrieve(image_data, file_path)
-             # Download the image from the URL
-            response = urllib.request.urlopen(image_data.url)
-            image_bytes = response.read()
-            
-            # Save the image bytes to the file path
-            with open(file_path, 'wb') as file:
-                file.write(image_bytes)
-                
-            # Optionally, perform background tasks here
-            # background_tasks.add_task(some_background_task, image_bytes)
+        # Define the data
+        status = {
+            "id": data.id,
+            "progress ": f"{len(data.images)} images URL received",
+            "status": "Images preprocess"
+        }
+        # Specify the filename
+        status_f = f'{data.id}.json'
+        # Write the data to the JSON file
+        with open(status_f, 'w') as file:
+            json.dump(status, file)
 
-        print("Images saved successfully!")
+        background_tasks.add_task(process_image,data.images,data.id)
+        return {"Images Received"}
 
-        # Create TSV file
-        create_image_data_tsv(f'dataset/{data.id}/dense/images',f'dataset/{data.id}/image_data.tsv')
-        print("TSV created..")
-
-        # Provide the folder path containing the images
-        image_folder_path = f'dataset/{data.id}/dense/images'
-
-        # Provide the path where you want to save the sparse reconstruction
-        output_sparse_path = f'dataset/{data.id}/dense'
-
-        # Run COLMAP sparse reconstruction on the specified folder
-        colmap_sparse_reconstruction(image_folder_path, output_sparse_path)
-        rename_folder(f'dataset/{data.id}/dense/0', f'dataset/{data.id}/dense/sparse')
-        print("Sparse reconstruction completed successfully!")
-
-        # #execute train.py using subprocess
-        # train_script_path = 'train.py'
-
-        # train_args = [
-        #     "--img_downscale", "8",
-        #     "--root_dir", "dataset/",
-        #     "--num_epochs", "10",
-        #     "--id","xxx1"
-        # ]
-        # command = ['python3', train_script_path] + train_args
-        # # background_tasks.add_task(subprocess.run(command, check=True, shell=False))
-        # # return {"message": "Training started"}
-        # # Start the training process in the background
-        # subprocess.Popen(command)
-        
-        # print("Training started.")
-        # return {"message": "Training started"}
-    
-        # # try:
-        # #     subprocess.run(command, check=True, shell=False)
-        # #     subprocess.run(["rm", "-rf", "dataset"], check=True)
-        # # except subprocess.CalledProcessError as e:
-        # #     print("train.py execution failed:", e)
-        # # print("train.py execution completed successfully!")
-        # # return {"message": "Training finished successfully!"}
 
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="JSON file not found")
@@ -117,7 +71,17 @@ async def upload_images(data: MultiImageData,background_tasks: BackgroundTasks):
 
 @app.post("/reconstruct")
 async def upload_images(data: Parameters,background_tasks: BackgroundTasks):
-
+    # Update the status dictionary
+    status = {
+        "id": data.id,
+        "progress": f"0 of {data.epochs} epochs",
+        "status": "training"
+    }
+    # Specify the filename
+    status_f = f'{data.id}.json'       
+    # Write the updated data to the JSON file
+    with open(status_f, 'w') as file:
+        json.dump(status, file)
     #execute train.py using subprocess
     train_script_path = 'train.py'
 
@@ -131,7 +95,7 @@ async def upload_images(data: Parameters,background_tasks: BackgroundTasks):
     # background_tasks.add_task(subprocess.run(command, check=True, shell=False))
     # return {"message": "Training started"}
     # Start the training process in the background
-    subprocess.Popen(command)
+  #  subprocess.Popen(command)
     
     print("Training started.")
     return {"message": "Training started"}
@@ -145,3 +109,68 @@ def get_mesh(id: str):
 def get_status(id: str):
     filename = f"{id}.json"
     return FileResponse(filename, media_type="application/json")
+
+def process_image(data_images,data_id):
+    for image_data in data_images:
+
+        # Update the progress message
+        index = 0
+        progress = f"{index} of {len(data_images)} images"
+        index = index + 1
+        # Update the status dictionary
+        status = {
+            "id": data_id,
+            "progress": progress,
+            "status": "Preprocessing Images"
+        }
+        # Specify the filename
+        status_f = f'{data_id}.json'       
+        # Write the updated data to the JSON file
+        with open(status_f, 'w') as file:
+            json.dump(status, file)
+
+        # Generate a filename based on the ID and timestamp
+        ts = time.time()
+        #filename = f'image_{int(ts)}.jpg'
+        filename = f'image_{image_data.url.split("/")[-1]}_{int(ts)}.jpg'
+        file_path = os.path.join(f'dataset/{data_id}/dense/images', filename)
+        # Convert base64 string to bytes
+        #urllib.request.urlretrieve(image_data, file_path)
+            # Download the image from the URL
+        response = urllib.request.urlopen(image_data.url)
+        image_bytes = response.read()
+        
+        # Save the image bytes to the file path
+        with open(file_path, 'wb') as file:
+            file.write(image_bytes)
+            
+        # Optionally, perform background tasks here
+        # background_tasks.add_task(some_background_task, image_bytes)
+
+    print("Images saved successfully!")
+
+    # Create TSV file
+    create_image_data_tsv(f'dataset/{data_id}/dense/images',f'dataset/{data_id}/image_data.tsv')
+    print("TSV created..")
+
+    # Provide the folder path containing the images
+    image_folder_path = f'dataset/{data_id}/dense/images'
+
+    # Provide the path where you want to save the sparse reconstruction
+    output_sparse_path = f'dataset/{data_id}/dense'
+
+    # Run COLMAP sparse reconstruction on the specified folder
+    colmap_sparse_reconstruction(image_folder_path, output_sparse_path)
+    rename_folder(f'dataset/{data_id}/dense/0', f'dataset/{data_id}/dense/sparse')
+    print("Sparse reconstruction completed successfully!")
+    # Update the status dictionary
+    status = {
+        "id": data_id,
+        "progress": "Done",
+        "status": "Ready for reconstruction"
+    }
+    # Specify the filename
+    status_f = f'{data_id}.json'       
+    # Write the updated data to the JSON file
+    with open(status_f, 'w') as file:
+        json.dump(status, file)
