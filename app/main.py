@@ -52,7 +52,7 @@ async def upload_images(data: MultiImageData,background_tasks: BackgroundTasks):
         status = {
             "id": data.id,
             "progress ": f"{len(data.images)} images URL received",
-            "status": "Images preprocess"
+            "status": "Images preprocessing"
         }
         # Specify the filename
         status_f = f'{data.id}.json'
@@ -112,23 +112,6 @@ def get_status(id: str):
 
 def process_image(data_images,data_id):
     for image_data in data_images:
-
-        # Update the progress message
-        index = 0
-        progress = f"{index} of {len(data_images)} images"
-        index = index + 1
-        # Update the status dictionary
-        status = {
-            "id": data_id,
-            "progress": progress,
-            "status": "Preprocessing Images"
-        }
-        # Specify the filename
-        status_f = f'{data_id}.json'       
-        # Write the updated data to the JSON file
-        with open(status_f, 'w') as file:
-            json.dump(status, file)
-
         # Generate a filename based on the ID and timestamp
         ts = time.time()
         #filename = f'image_{int(ts)}.jpg'
