@@ -77,33 +77,44 @@ async def upload_images(data: Parameters,background_tasks: BackgroundTasks):
         "progress": f"0 of {data.epochs} epochs",
         "status": "training"
     }
+    result = {
+        "id": data.id,
+        "status": "Pending Result"
+    }
     # Specify the filename
-    status_f = f'{data.id}.json'       
+    status_f = f'{data.id}.json'
+    result_f = f'{data.id}r.json'       
     # Write the updated data to the JSON file
     with open(status_f, 'w') as file:
         json.dump(status, file)
+    with open(result_f, 'w') as file:
+        json.dump(result, file)
+
     #execute train.py using subprocess
     train_script_path = 'train.py'
 
     train_args = [
-        "--img_downscale", "256",
-        "--root_dir", "dataset/1/",
-        "--num_epochs", "10",
-        "--id","xxx1"
+        "--img_downscale", f"{data.downscale}",
+        "--root_dir", f"dataset/{data.id}/",
+        "--num_epochs", f"{data.epochs}",
+        "--id",f"{data.id}"
     ]
     command = ['python3', train_script_path] + train_args
+    print(command)
     # background_tasks.add_task(subprocess.run(command, check=True, shell=False))
     # return {"message": "Training started"}
     # Start the training process in the background
-  #  subprocess.Popen(command)
+    subprocess.Popen(command)
     
     print("Training started.")
     return {"message": "Training started"}
 
 @app.get("/download/{id}")
 def get_mesh(id: str):
-    filename = f"{id}.ply"
-    return FileResponse(filename, media_type="model/ply")
+    # filename = f"{id}.ply"
+    filename = f"{id}r.json"
+    # return FileResponse(filename, media_type="model/ply")
+    return FileResponse(filename, media_type="application/json")
 
 @app.get("/status/{id}")
 def get_status(id: str):
@@ -126,6 +137,9 @@ def process_image(data_images,data_id):
         # Save the image bytes to the file path
         with open(file_path, 'wb') as file:
             file.write(image_bytes)
+        
+        # Wait for 2 seconds
+        time.sleep(1)
             
         # Optionally, perform background tasks here
         # background_tasks.add_task(some_background_task, image_bytes)

@@ -65,10 +65,15 @@ class PhototourismDataset(Dataset):
                 img_path_to_id[v.name] = v.id
             self.img_ids = []
             self.image_paths = {} # {id: filename}
+            count = 0
             for filename in list(self.files['filename']):
-                id_ = img_path_to_id[filename]
-                self.image_paths[id_] = filename
-                self.img_ids += [id_]
+                if filename in img_path_to_id:
+                    id_ = img_path_to_id[filename]
+                    self.image_paths[id_] = filename
+                    self.img_ids += [id_]
+                else:
+                    count += 1
+            print(f'Number of skipped images: {count}')
 
         # Step 2: read and rescale camera intrinsics
         if self.use_cache:
@@ -79,15 +84,16 @@ class PhototourismDataset(Dataset):
             camdata = read_cameras_binary(os.path.join(self.root_dir, 'dense/sparse/cameras.bin'))
             for id_ in self.img_ids:
                 K = np.zeros((3, 3), dtype=np.float32)
-                cam = camdata[id_]
-                img_w, img_h = int(cam.params[2]*2), int(cam.params[3]*2)
-                img_w_, img_h_ = img_w//self.img_downscale, img_h//self.img_downscale
-                K[0, 0] = cam.params[0]*img_w_/img_w # fx
-                K[1, 1] = cam.params[1]*img_h_/img_h # fy
-                K[0, 2] = cam.params[2]*img_w_/img_w # cx
-                K[1, 2] = cam.params[3]*img_h_/img_h # cy
-                K[2, 2] = 1
-                self.Ks[id_] = K
+                if id_ in camdata:
+                    cam = camdata[id_]
+                    img_w, img_h = int(cam.params[2]*2), int(cam.params[3]*2)
+                    img_w_, img_h_ = img_w//self.img_downscale, img_h//self.img_downscale
+                    K[0, 0] = cam.params[0]*img_w_/img_w # fx
+                    K[1, 1] = cam.params[1]*img_h_/img_h # fy
+                    K[0, 2] = cam.params[2]*img_w_/img_w # cx
+                    K[1, 2] = cam.params[3]*img_h_/img_h # cy
+                    K[2, 2] = 1
+                    self.Ks[id_] = K
 
         # Step 3: read c2w poses (of the images in tsv file only) and correct the order
         if self.use_cache:
@@ -167,15 +173,16 @@ class PhototourismDataset(Dataset):
                     img = img.view(3, -1).permute(1, 0) # (h*w, 3) RGB
                     self.all_rgbs += [img]
                     
-                    directions = get_ray_directions(img_h, img_w, self.Ks[id_])
-                    rays_o, rays_d = get_rays(directions, c2w)
-                    rays_t = id_ * torch.ones(len(rays_o), 1)
+                    if id_ in self.Ks:
+                        directions = get_ray_directions(img_h, img_w, self.Ks[id_])
+                        rays_o, rays_d = get_rays(directions, c2w)
+                        rays_t = id_ * torch.ones(len(rays_o), 1)
 
-                    self.all_rays += [torch.cat([rays_o, rays_d,
-                                                self.nears[id_]*torch.ones_like(rays_o[:, :1]),
-                                                self.fars[id_]*torch.ones_like(rays_o[:, :1]),
-                                                rays_t],
-                                                1)] # (h*w, 8)
+                        self.all_rays += [torch.cat([rays_o, rays_d,
+                                                    self.nears[id_]*torch.ones_like(rays_o[:, :1]),
+                                                    self.fars[id_]*torch.ones_like(rays_o[:, :1]),
+                                                    rays_t],
+                                                    1)] # (h*w, 8)
                                     
                 self.all_rays = torch.cat(self.all_rays, 0) # ((N_images-1)*h*w, 8)
                 self.all_rgbs = torch.cat(self.all_rgbs, 0) # ((N_images-1)*h*w, 3)

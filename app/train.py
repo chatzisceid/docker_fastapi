@@ -205,6 +205,17 @@ async def main(args):
 
 	# with open(args.config) as config_file:
 	# 	config = json.load(config_file)
+	#########write JSON file##########
+	status = {
+		"id": args.id,
+		"progress": f"1 of {args.num_epochs} epochs",
+		"status": "Training"
+	}
+	status_f = f'{args.id}.json'
+	# Load the current status from the JSON file
+	with open(status_f, "w") as file:
+		json.dump(status, file)
+	##################################
 	print("Creating model...")
 	nerf = Nerf(args, 'config').to(device)
 	print("Creating optimizer...")
@@ -224,23 +235,28 @@ async def main(args):
 
 	#########write JSON file##########
 		if epoch == args.num_epochs - 1:
-			status = {"id": args.id, "progress %": 100, "status": "finished"}
+			status = {
+				"id": args.id,
+				"progress": f"{epoch+1} of {args.num_epochs} epochs",
+				"status": "Train Finished"
+			}
+			result = {
+				"id": args.id,
+				"status": "Results ready"
+			}
+			result_f = f'{args.id}r.json'
+			with open(result_f, "w") as file:
+				json.dump(result, file)
 		else:
-			status = {"id": args.id, "progress %": ((epoch+1)/args.num_epochs)*100, "status": "training"}
-
+			status = {
+				"id": args.id,
+				"progress": f"{epoch} of {args.num_epochs} epochs",
+				"status": "training"
+			}
+		status_f = f'{args.id}.json'
 		# Load the current status from the JSON file
-		try:
-			with open(f"{args.id}.json", "r") as fp:
-				current_status = json.load(fp)
-		except FileNotFoundError:
-			current_status = {}
-
-		# Update the current status with the new status
-		current_status.update(status)
-
-		# Save the updated status to the JSON file
-		with open(f"{args.id}.json", "w") as fp:
-			json.dump(current_status, fp)
+		with open(status_f, "w") as file:
+			json.dump(status, file)
 		##################################
 			
 		val_loss = validate_one_epoch(epoch,nerf, val_loader, device)

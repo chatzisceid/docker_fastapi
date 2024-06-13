@@ -121,6 +121,9 @@ ENV XDG_RUNTIME_DIR=/tmp/runtime-root
 
 RUN rm -rf /var/lib/apt/lists/*
 
+# Install COLMAP
+RUN apt-get update && apt-get install -y colmap
+
 # Copy the FastAPI application into the container
 COPY app/ .
 
