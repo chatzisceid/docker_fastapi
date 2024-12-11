@@ -8,9 +8,9 @@ ARG OS_VERSION
 ARG USER_ID
 
 # metainformation
-LABEL org.opencontainers.image.version = "0.1.18"
-LABEL org.opencontainers.image.source = "https://github.com/nerfstudio-project/nerfstudio"
-LABEL org.opencontainers.image.licenses = "Apache License 2.0"
+LABEL org.opencontainers.image.version="0.1.18"
+LABEL org.opencontainers.image.source="https://github.com/nerfstudio-project/nerfstudio"
+LABEL org.opencontainers.image.licenses="Apache License 2.0"
 LABEL org.opencontainers.image.base.name="docker.io/library/nvidia/cuda:${CUDA_VERSION}-devel-ubuntu${OS_VERSION}"
 
 # Variables used at build time.
