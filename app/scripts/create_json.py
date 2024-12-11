@@ -32,5 +32,5 @@ def create_image_json(folder_path):
         json.dump(json_data, file, indent=2)
 
 # Provide the path to the folder containing images
-folder_path = '/media/chatzise/E0E43345E4331CEA/dataset_test/'
-create_image_json(folder_path)
+#folder_path = '/media/chatzise/E0E43345E4331CEA/dataset_test/'
+#create_image_json(folder_path)

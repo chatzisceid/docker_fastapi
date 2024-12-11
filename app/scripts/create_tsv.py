@@ -24,4 +24,4 @@ def create_image_data_tsv(folder_path, tsv_file_path):
                 tsvfile.write(f"{filename}\t{image_id}\t{split}\t{dataset}\n")
 
 # Create TSV file
-create_image_data_tsv('/media/chatzise/E0E43345E4331CEA/xreco_new_buildings/Chilehaus/dense/images/','/media/chatzise/E0E43345E4331CEA/xreco_new_buildings/Chilehaus/image_data.tsv')
+#create_image_data_tsv('/media/chatzise/E0E43345E4331CEA/xreco_new_buildings/Chilehaus/dense/images/','/media/chatzise/E0E43345E4331CEA/xreco_new_buildings/Chilehaus/image_data.tsv')

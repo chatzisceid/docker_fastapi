@@ -1,4 +1,4 @@
-ARG CUDA_VERSION=11.7.1
+ARG CUDA_VERSION=11.8.0
 ARG OS_VERSION=22.04
 ARG USER_ID=1000
 # Define base image.
@@ -16,7 +16,7 @@ LABEL org.opencontainers.image.base.name="docker.io/library/nvidia/cuda:${CUDA_V
 # Variables used at build time.
 ## CUDA architectures, required by Colmap and tiny-cuda-nn.
 ## NOTE: All commonly used GPU architectures are included and supported here. To speedup the image build process remove all architectures but the one of your explicit GPU. Find details here: https://developer.nvidia.com/cuda-gpus (8.6 translates to 86 in the line below) or in the docs.
-ARG CUDA_ARCHITECTURES=86;80;75;70;61;52;37
+ARG CUDA_ARCHITECTURES=90;89;86;80;75;70;61;52;37
 
 # Set environment variables.
 ## Set non-interactive to prevent asking for user inputs blocking image creation.
@@ -130,36 +130,40 @@ RUN python3.10 -m pip install --no-cache-dir git+https://github.com/NVlabs/tiny-
 
 # Copy the requirements file into the container
 COPY requirements.txt .
-COPY torch-1.13.1+cu117-cp310-cp310-linux_x86_64.whl .
-COPY torchvision-0.14.1+cu117-cp310-cp310-linux_x86_64.whl .
-COPY torchaudio-0.13.1+cu117-cp310-cp310-linux_x86_64.whl .
+# COPY torch-1.13.1+cu117-cp310-cp310-linux_x86_64.whl .
+# COPY torchvision-0.14.1+cu117-cp310-cp310-linux_x86_64.whl .
+# COPY torchaudio-0.13.1+cu117-cp310-cp310-linux_x86_64.whl .
 
 # Install the .whl files
-RUN pip uninstall -y torch
-RUN pip install --no-cache-dir torch-1.13.1+cu117-cp310-cp310-linux_x86_64.whl
-RUN pip install --no-cache-dir torchvision-0.14.1+cu117-cp310-cp310-linux_x86_64.whl
-RUN pip install --no-cache-dir torchaudio-0.13.1+cu117-cp310-cp310-linux_x86_64.whl
+# RUN pip uninstall -y torch
+# RUN pip install --no-cache-dir torch-1.13.1+cu117-cp310-cp310-linux_x86_64.whl
+# RUN pip install --no-cache-dir torchvision-0.14.1+cu117-cp310-cp310-linux_x86_64.whl
+# RUN pip install --no-cache-dir torchaudio-0.13.1+cu117-cp310-cp310-linux_x86_64.whl
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 #install pytorch scatter
-RUN pip install torch-scatter -f https://data.pyg.org/whl/torch-2.3.0+cu117.html
+RUN pip install torch-scatter -f https://data.pyg.org/whl/torch-2.0.0+cu118.html
+
+#numpy older version
+RUN python3.10 -m pip uninstall -y numpy
+RUN python3.10 -m pip install numpy==1.26.4
+
+# Copy the FastAPI application into the container
+WORKDIR /app
+COPY app/ .
 
 # Install Apex
 RUN git clone https://github.com/NVIDIA/apex
 WORKDIR /app/apex
-RUN pip install apex
-WORKDIR /app
-
-
+RUN pip install -v --disable-pip-version-check --no-build-isolation --no-cache-dir .
 
 #Install vren
 COPY models/ /app/models/
 #RUN pip install /app/models/csrc
 
-# Copy the FastAPI application into the container
-COPY app/ .
+WORKDIR /app
 
 # Expose the port that FastAPI will run on
 EXPOSE 8000

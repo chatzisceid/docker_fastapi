@@ -36,12 +36,12 @@ def rename_folder(old_name, new_name):
 
 
 # # Provide the folder path containing the images
-image_folder_path = '/media/chatzise/E0E43345E4331CEA/lego/lego/train/'
+#image_folder_path = '/media/chatzise/E0E43345E4331CEA/lego/lego/train/'
 
 # # Provide the path where you want to save the sparse reconstruction
-output_sparse_path = '/media/chatzise/E0E43345E4331CEA/lego/lego/sparse/'
+#output_sparse_path = '/media/chatzise/E0E43345E4331CEA/lego/lego/sparse/'
 
 # # Run COLMAP sparse reconstruction on the specified folder
-colmap_sparse_reconstruction(image_folder_path, output_sparse_path)
+#colmap_sparse_reconstruction(image_folder_path, output_sparse_path)
 # rename_folder('dataset/dense/0', 'dataset/dense/sparse')
 # print("Sparse reconstruction completed successfully!")
