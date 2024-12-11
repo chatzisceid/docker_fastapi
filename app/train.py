@@ -1,8 +1,8 @@
-import commentjson as json
 import numpy as np
 import torch
 from opt import *
 from nir import *
+import commentjson as json
 #import tinycudann as tcnn
 from nir.utils import read_image, write_image, psnr, visualize_depth
 from nir.rendering import render_rays
