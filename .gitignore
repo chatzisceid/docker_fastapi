@@ -20,3 +20,6 @@ Thumbs.db
 *.whl
 *.db*
 
+app/runs/
+app/scripts/dataset/*.jpg
+app/*.json
