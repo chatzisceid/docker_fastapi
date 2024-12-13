@@ -7,9 +7,9 @@ from tqdm import tqdm
 import imageio
 from argparse import ArgumentParser
 
-from nir.nir import *
-from nir.nir.rendering import render_rays
-from nir.nir.utils import read_image, write_image, psnr, visualize_depth
+from nir import *
+from nir.rendering import render_rays
+from nir.utils import read_image, write_image, psnr, visualize_depth
 
 
 torch.backends.cudnn.benchmark = True

@@ -208,7 +208,7 @@ async def main(args):
 	#########write JSON file##########
 	status = {
 		"id": args.id,
-		"progress": f"1 of {args.num_epochs} epochs",
+		"progress": round(1/(args.num_epochs)*100),
 		"status": "Training"
 	}
 	status_f = f'{args.id}.json'
@@ -237,7 +237,7 @@ async def main(args):
 		if epoch == args.num_epochs - 1:
 			status = {
 				"id": args.id,
-				"progress": f"{epoch+1} of {args.num_epochs} epochs",
+				"progress": 100,
 				"status": "Train Finished"
 			}
 			result = {
@@ -250,7 +250,7 @@ async def main(args):
 		else:
 			status = {
 				"id": args.id,
-				"progress": f"{epoch} of {args.num_epochs} epochs",
+				"progress": round((epoch+1)/(args.num_epochs)*100),
 				"status": "training"
 			}
 		status_f = f'{args.id}.json'

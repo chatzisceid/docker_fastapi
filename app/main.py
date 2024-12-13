@@ -99,7 +99,7 @@ async def upload_images(data: Parameters,background_tasks: BackgroundTasks):
         # Define the data
         status = {
             "id": data.id,
-            "progress %": f"0 of {data.epochs} epochs",
+            "progress %": 0,
             "status": "training"
         }
         result = {
