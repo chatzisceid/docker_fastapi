@@ -70,7 +70,7 @@ def get_opts():
     parser.add_argument('--video_format', type=str, default='gif',
                         choices=['gif', 'mp4'],
                         help='video format, gif or mp4')
-    parser.add_argument("--config", nargs="?", default="config/config_hash.json", help="JSON config for tiny-cuda-nn")
+    parser.add_argument("--config", nargs="?", default="app/config/config_hash.json", help="JSON config for tiny-cuda-nn")
 
     return parser.parse_args()
 
@@ -109,13 +109,13 @@ def batched_inference(models, embeddings,
 
 
 if __name__ == "__main__":
+    print("!!Evaluation in!!")
     args = get_opts()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     with open(args.config) as config_file:
         config = json.load(config_file)
 
-    #nerf = Mlp('test')
-    nerf = Mlp.load_state_dict(torch.load(args.ckpt_path))
+    nerf = load_model(args.ckpt_path, device)
 
     kwargs = {'root_dir': args.root_dir,
               'split': args.split}

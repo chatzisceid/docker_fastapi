@@ -23,3 +23,16 @@ Thumbs.db
 app/runs/
 app/scripts/dataset/*.jpg
 app/*.json
+
+.codegpt
+1b.json
+1br.json
+*.jpg
+*.bin
+*.ini
+app/images/1b/image_data.tsv
+*.pth
+*.zip
+*.ckpt
+*.png
+*.0

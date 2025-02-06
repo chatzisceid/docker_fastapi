@@ -133,10 +133,8 @@ async def upload_images(data: Parameters,background_tasks: BackgroundTasks):
 
 @app.get("/download/{id}")
 def get_mesh(id: str):
-    # filename = f"{id}.ply"
-    filename = f"{id}r.json"
-    # return FileResponse(filename, media_type="model/ply")
-    return FileResponse(filename, media_type="application/json")
+    filename = f"asset_{id}.zip"
+    return FileResponse(filename, media_type="application/zip")
 
 @app.get("/status/{id}")
 def get_status(id: str):
